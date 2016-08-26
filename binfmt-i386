@@ -1,0 +1,67 @@
+#!/bin/sh
+
+task(){
+	echo -e "[ .. ] \033[1;33m$1\033[0m" 
+}
+tdone(){
+	echo -e "[ \033[1;32mok\033[0m ] \033[0;32mDone\033[0m\n"
+}
+terror(){
+	echo -e "[ \033[1;31m!!\033[0m ] \033[0;31m$1\033[0m\n"
+}
+
+tinfo(){
+	echo -e "[ .. ]		\033[0;33m$1\033[0m" 
+}
+
+if [ ! -f /proc/sys/fs/binfmt_misc/register ]; then
+	terror "Your kernel does not seem to support BINFMT_MISC. Please make your kernel did compile with either BINFMT_MISC=Y or BINFMT_MISC=M and load the 'BINFMT_MISC' module."
+	exit 1;
+fi
+
+qemubin=$(which qemu-i386)
+if [ ! -x "$qemubin" ]; then
+	terror "Cannot find the qemu-i386 executable on your path"
+	exit 1;
+fi
+
+if [ "$(id -u)" != "0" ]; then
+	terror "You need to be root to do this."
+	exit 1;
+fi
+
+if [ "$1" == "start" ]; then
+	task 	"Registering /usr/bin/qemu-i386 as handler for IA32 binaries";
+	if [ -f /proc/sys/fs/binfmt_misc/i386 ]; then
+		tinfo "There already seems to be a handler in place. If you suspect another handler to bin in effect you can use 'stop' to remove it."
+	else
+		echo ':i386:M::\x7fELF\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03:\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfb\xff\xff:/usr/bin/qemu-i386:' > /proc/sys/fs/binfmt_misc/register
+		tdone
+	fi
+	exit 0
+fi
+	
+if [ "$1" == "stop" ]; then
+	task 	"Removing the existing handler for IA32 binaries"
+	if [ -f /proc/sys/fs/binfmt_misc/i386 ]; then
+		echo "-1" > /proc/sys/fs/binfmt_misc/i386
+		tdone
+	else
+		tinfo	"No handler to remove."
+	fi
+	exit 0
+fi
+cat <<EOT
+Usage: binfmt-i386 start|stop
+Registers qemu-i386 to binfmt_misc to handle IA32 binaries
+
+start		Registers qemu-i386 as handler for IA32
+stop		Removes the handler
+
+
+See qemu-i386 -h for more information.
+
+Author: Sven Kayser, sk@urbanstudio.de
+Version: 20160826
+License: MIT License
+EOT
