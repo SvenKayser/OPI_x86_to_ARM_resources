@@ -53,13 +53,13 @@ if [ "$1" == "stop" ]; then
 fi
 cat <<EOT
 Usage: binfmt-i386 start|stop
-Registers qemu-i386 to binfmt_misc to handle IA32 binaries
+Registers qemu-i386-static to binfmt_misc to handle IA32 binaries
 
 start		Registers qemu-i386 as handler for IA32
 stop		Removes the handler
 
 
-See qemu-i386 -h for more information.
+See qemu-i386-static -h for more information.
 
 Author: Sven Kayser, sk@urbanstudio.de
 Version: 20160826
