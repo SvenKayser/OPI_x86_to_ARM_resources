@@ -19,9 +19,9 @@ if [ ! -f /proc/sys/fs/binfmt_misc/register ]; then
 	exit 1;
 fi
 
-qemubin=$(which qemu-i386)
+qemubin=$(which qemu-i386-static)
 if [ ! -x "$qemubin" ]; then
-	terror "Cannot find the qemu-i386 executable on your path"
+	terror "Cannot find the qemu-i386-static executable on your path"
 	exit 1;
 fi
 
@@ -31,11 +31,11 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 if [ "$1" == "start" ]; then
-	task 	"Registering /usr/bin/qemu-i386 as handler for IA32 binaries";
+	task 	"Registering /usr/bin/qemu-i386-static as handler for IA32 binaries";
 	if [ -f /proc/sys/fs/binfmt_misc/i386 ]; then
 		tinfo "There already seems to be a handler in place. If you suspect another handler to bin in effect you can use 'stop' to remove it."
 	else
-		echo ':i386:M::\x7fELF\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03:\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfb\xff\xff:/usr/bin/qemu-i386:' > /proc/sys/fs/binfmt_misc/register
+		echo ':i386:M::\x7fELF\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03:\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfb\xff\xff:/usr/bin/qemu-i386-static:' > /proc/sys/fs/binfmt_misc/register
 		tdone
 	fi
 	exit 0
