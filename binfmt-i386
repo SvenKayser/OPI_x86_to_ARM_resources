@@ -33,7 +33,8 @@ fi
 if [ "$1" == "start" ]; then
 	task 	"Registering /usr/bin/qemu-i386-static as handler for IA32 binaries";
 	if [ -f /proc/sys/fs/binfmt_misc/i386 ]; then
-		tinfo "There already seems to be a handler in place. If you suspect another handler to bin in effect you can use 'stop' to remove it."
+		tinfo "There already seems to be a handler in place. If you suspect another handler to be in effect you can use 'stop' to remove it."
+		exit 1;
 	else
 		echo ':i386:M::\x7fELF\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03:\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfb\xff\xff:/usr/bin/qemu-i386-static:' > /proc/sys/fs/binfmt_misc/register
 		tdone
@@ -62,6 +63,6 @@ stop		Removes the handler
 See qemu-i386-static -h for more information.
 
 Author: Sven Kayser, sk@urbanstudio.de
-Version: 20160826
+Version: 20160829
 License: MIT License
 EOT
